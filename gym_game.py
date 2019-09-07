@@ -1,3 +1,4 @@
+import warnings
 import gym
 
 import gaming
@@ -5,11 +6,15 @@ from mcts import MCTS
 
 
 class GymGame(gaming.Game):
-    def __init__(self, env_name: str):
+    def __init__(self, env_name: str, render=False):
         self.env_name = env_name
+        self.render = render
 
     def get_initial_state(self):
-        env = gym.make(self.env_name)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            env = gym.make(self.env_name)
+        env.seed(1)
         state = env.reset()
         return env, state, list()
 
@@ -23,6 +28,8 @@ class GymGame(gaming.Game):
     def get_result_state(self, state, action, player):
         env, _, actions = state
         inner_state, reward, done, _ = env.step(action)
+        if self.render:
+            env.render()
         actions = actions.copy()
         actions.append(action)
         return (env, inner_state, actions), reward, done
@@ -33,24 +40,27 @@ class GymGame(gaming.Game):
         env, _, _ = self.get_initial_state()
         for a in actions:
             state, reward, done, _ = env.step(a)
+            if done:
+                raise Exception('cloning environment which is considered done for current action list')
         return env, state, actions
 
 
 class GymNStepsGame(GymGame):
-    def __init__(self, env_name: str):
-        super().__init__(env_name)
+    def __init__(self, env_name: str, render=False):
+        super().__init__(env_name, render)
 
     def get_result_state(self, state, action, player):
-        (env, inner_state, actions), reward, done = super().get_result_state(state, action, player)
-        reward = len(actions)
-        return (env, inner_state, actions), reward, done
+        state, reward, done = super().get_result_state(state, action, player)
+        reward = -10 if done else 0  # aggressive penalty for loss to reduce exploration level
+        return state, reward, done
 
 
 def test_play():
     ttt = GymNStepsGame('CartPole-v1')
     s1 = MCTS(ttt, n_plays=50, max_depth=30, player=1)
 
-    state, rewards, steps, log = gaming.play_game(ttt, [s1], max_turns=50)
+    ttt_play = GymNStepsGame('CartPole-v1')
+    state, rewards, steps, log = gaming.play_game(ttt_play, [s1], max_turns=50)
     print()
     print(f'steps: {steps}')
     print(rewards)

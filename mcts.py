@@ -70,6 +70,8 @@ class MCTS(gaming.PlayerPolicy):
                         current_node.update_stats(reward)
                         if done:
                             break
+                if done:
+                    break
 
         best_action = root.select_child().action
 
