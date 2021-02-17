@@ -2,10 +2,4 @@ Monte-Carlo Tree Search for board games and for the deterministic OpenAI Gym env
 
 ## Related work
 
-### Monte-carlo search for Atari
-
-See paper: Deep Learning for Real-Time Atari Game Play Using Offline Monte-Carlo Tree Search Planning / Guo et al. / NIPS 2014
-
-**Algorithm:**
-1. Use MCTS from the initial state to learn good action distributions for a set of states
-2. Train a CNN to mimic MCST action distribtions by trainging for multinominal classification
+- Deep Learning for Real-Time Atari Game Play Using Offline Monte-Carlo Tree Search Planning / Guo et al. / NIPS 2014
