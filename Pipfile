@@ -8,7 +8,7 @@ pytest = "*"
 pylint = "*"
 
 [packages]
-gym = {extras = ["atari"], version = ">=0.10"}
+gym = {extras = ["atari"], version = ">=0.21"}
 
 [requires]
 python_version = "3.8"

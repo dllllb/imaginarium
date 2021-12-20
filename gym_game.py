@@ -14,6 +14,11 @@ class GymGame(gaming.Game):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             env = gym.make(self.env_name)
+
+        if self.render:
+            from gym.wrappers import RecordVideo
+            env = RecordVideo(env, video_folder='.')
+
         env.seed(1)
         state = env.reset()
         return env, state, list()
@@ -28,8 +33,6 @@ class GymGame(gaming.Game):
     def get_result_state(self, state, action, player):
         env, _, actions = state
         inner_state, reward, done, _ = env.step(action)
-        if self.render:
-            env.render()
         actions = actions.copy()
         actions.append(action)
         return (env, inner_state, actions), reward, done
@@ -37,7 +40,13 @@ class GymGame(gaming.Game):
     def clone(self, state):
         _, _, actions = state
         actions = actions.copy()
-        env, _, _ = self.get_initial_state()
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            env = gym.make(self.env_name)
+        env.seed(1)
+        env.reset()
+
         for a in actions:
             state, reward, done, _ = env.step(a)
             if done:
