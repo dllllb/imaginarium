@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="cartpole-mcts-demo.gif" />
+</p>
+
 Monte-Carlo Tree Search for board games and for the deterministic OpenAI Gym environments.
 
 ## Related papers
