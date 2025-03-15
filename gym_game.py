@@ -1,26 +1,27 @@
 import warnings
-import gym
+import gymnasium as gym
+import numpy as np
 
 import gaming
 from mcts import MCTS
 
 
 class GymGame(gaming.Game):
-    def __init__(self, env_name: str, render=False):
+    def __init__(self, env_name: str, render = 'rgb_array', record = False):
         self.env_name = env_name
         self.render = render
-
+        self.record = record
+        
     def get_initial_state(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            env = gym.make(self.env_name)
+            env = gym.make(self.env_name, render_mode=self.render)
 
-        if self.render:
+        if self.record:
             from gym.wrappers import RecordVideo
             env = RecordVideo(env, video_folder='.')
 
-        env.seed(1)
-        state = env.reset()
+        state, _ = env.reset(seed=1)
         return env, state, list()
 
     def get_possible_actions(self, state, player):
@@ -32,7 +33,7 @@ class GymGame(gaming.Game):
 
     def get_result_state(self, state, action, player):
         env, _, actions = state
-        inner_state, reward, done, _ = env.step(action)
+        inner_state, reward, done, _, _ = env.step(action)
         actions = actions.copy()
         actions.append(action)
         return (env, inner_state, actions), reward, done
@@ -44,19 +45,19 @@ class GymGame(gaming.Game):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             env = gym.make(self.env_name)
-        env.seed(1)
-        env.reset()
+        
+        state, _ = env.reset(seed=1)
 
         for a in actions:
-            state, reward, done, _ = env.step(a)
+            state, reward, done, _, _ = env.step(a)
             if done:
                 raise Exception('cloning environment which is considered done for current action list')
         return env, state, actions
 
 
 class GymNStepsGame(GymGame):
-    def __init__(self, env_name: str, render=False):
-        super().__init__(env_name, render)
+    def __init__(self, env_name: str, render = 'rgb_array', record=False):
+        super().__init__(env_name, render, record)
 
     def get_result_state(self, state, action, player):
         state, reward, done = super().get_result_state(state, action, player)

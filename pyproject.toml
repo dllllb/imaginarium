@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "imaginarium"
+version = "0.1.0"
+description = "A collection of game implementations and AI experiments"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy<1.24",
+    "gymnasium[classic-control]",
+    "moviepy",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pylint",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["*.py"]
+
+[tool.pylint.messages.control]
+disable = ["C0111"]  # missing-docstring 

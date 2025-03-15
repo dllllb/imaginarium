@@ -14,7 +14,7 @@ class UcbNode:
         self.n_sim = 0
         self.reward = 0
         self.c = math.sqrt(2)
-        self.sf = np.finfo(np.float).tiny
+        self.sf = np.finfo(float).tiny
 
     def add_child(self, action):
         child = UcbNode(action, self)
